@@ -1,0 +1,40 @@
+<<<<<<< HEAD
+# Angular
+node_modules/
+dist/
+.angular/
+tmp/
+
+# Env
+src/environments/environment.prod.ts
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+=======
+# .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+packages/
+
+# Dependencies
+node_modules/
+wwwroot/lib/
+
+# Env
+appsettings.Development.json
+secrets.json
+
+# Logs
+*.log
+>>>>>>> a99eda3e79328af3ef951bb54d7ccea9fe96ec51

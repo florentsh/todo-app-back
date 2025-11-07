@@ -1,0 +1,6 @@
+@BackTodoApi_HostAddress = http://localhost:5091
+
+GET {{BackTodoApi_HostAddress}}/Todos/
+Accept: application/json
+
+###
