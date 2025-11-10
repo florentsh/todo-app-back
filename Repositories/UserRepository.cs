@@ -1,40 +1,41 @@
 ﻿using BackTodoApi.Dtos;
+using BackTodoApi.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackTodoApi.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserRepository(UserManager<IdentityUser> userManager)
+        public UserRepository(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
 
-        public async Task<IdentityUser?> GetByIdAsync(string userId)
+        public async Task<ApplicationUser?> GetByIdAsync(string userId)
         {
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<IdentityUser?> GetByEmailAsync(string email)
+        public async Task<ApplicationUser?> GetByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
         }
-        public async Task<IdentityUser?> GetByUsernameAsync(string username)
+
+        public async Task<ApplicationUser?> GetByUsernameAsync(string username)
         {
             return await _userManager.FindByNameAsync(username);
         }
 
-        public Task<IEnumerable<IdentityUser>> GetAllAsync()
+        public Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
             return Task.FromResult(_userManager.Users.AsEnumerable());
         }
 
-
         public async Task<IdentityResult> CreateUserAsync(UserRegisterDto dto, string password)
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = dto.Username,
                 Email = dto.Email
@@ -43,7 +44,7 @@ namespace BackTodoApi.Repositories
             return await _userManager.CreateAsync(user, password);
         }
 
-        public async Task<IdentityResult> UpdateAsync(IdentityUser user)
+        public async Task<IdentityResult> UpdateAsync(ApplicationUser user)
         {
             return await _userManager.UpdateAsync(user);
         }

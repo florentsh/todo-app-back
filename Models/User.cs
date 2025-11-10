@@ -1,10 +1,9 @@
-﻿namespace BackTodoApi.Models;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace BackTodoApi.Models
 {
-    public int Id { get; set; }
-    public string Username { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
-
-    public List<Todo> Todos { get; set; } = new();
+    public class ApplicationUser : IdentityUser
+    {
+        public List<Todo> Todos { get; set; } = new();
+    }
 }

@@ -17,7 +17,8 @@ namespace BackTodoApi.Models
         public string UserId { get; set; } = string.Empty;
 
         [ForeignKey(nameof(UserId))]
-        public virtual IdentityUser? User { get; set; }
+        public virtual ApplicationUser? User { get; set; } 
+
 
 
         public DateTime ExpiresAt { get; set; }

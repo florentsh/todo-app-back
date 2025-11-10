@@ -28,7 +28,7 @@ public class TodoService : ITodoService
         var todo = new Todo
         {
             Title = dto.Title,
-            Description = dto.Description,
+            Description = dto.Description!,
             UserId = dto.UserId
         };
 
@@ -95,7 +95,7 @@ public class TodoService : ITodoService
         }
 
         todo.Title = dto.Title;
-        todo.Description = dto.Description;
+        todo.Description = dto.Description!;
         todo.IsCompleted = dto.IsCompleted;
 
         await _repo.UpdateAsync(todo);

@@ -1,15 +1,16 @@
 ﻿using BackTodoApi.Dtos;
+using BackTodoApi.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackTodoApi.Repositories
 {
     public interface IUserRepository
     {
-        Task<IdentityUser?> GetByIdAsync(string userId);
-        Task<IdentityUser?> GetByEmailAsync(string email);
-        Task<IdentityUser?> GetByUsernameAsync(string username);
-        Task<IEnumerable<IdentityUser>> GetAllAsync();
+        Task<ApplicationUser?> GetByIdAsync(string userId);
+        Task<ApplicationUser?> GetByEmailAsync(string email);
+        Task<ApplicationUser?> GetByUsernameAsync(string username);
+        Task<IEnumerable<ApplicationUser>> GetAllAsync();
         Task<IdentityResult> CreateUserAsync(UserRegisterDto dto, string password);
-        Task<IdentityResult> UpdateAsync(IdentityUser user);
+        Task<IdentityResult> UpdateAsync(ApplicationUser user);
     }
 }

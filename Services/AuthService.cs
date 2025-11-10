@@ -1,5 +1,6 @@
 ﻿using BackTodoApi.Dtos;
 using BackTodoApi.Repositories;
+using BackTodoApi.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackTodoApi.Services;
@@ -7,10 +8,10 @@ namespace BackTodoApi.Services;
 public class AuthService
 {
     private readonly IUserRepository _userRepo;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
 
-    public AuthService(IUserRepository userRepo, SignInManager<IdentityUser> signInManager, ITokenService tokenService)
+    public AuthService(IUserRepository userRepo, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
     {
         _userRepo = userRepo;
         _signInManager = signInManager;
@@ -29,7 +30,12 @@ public class AuthService
         var user = await _userRepo.GetByUsernameAsync(dto.Username);
         var (accessToken, refreshToken) = await _tokenService.GenerateTokensAsync(user!);
 
-        return new { accessToken, refreshToken, user = new { id = user!.Id, username = user.UserName } };
+        return new
+        {
+            accessToken,
+            refreshToken,
+            user = new { id = user!.Id, username = user.UserName }
+        };
     }
 
     public async Task<object> LoginAsync(UserLoginDto dto)
@@ -38,10 +44,16 @@ public class AuthService
                    ?? throw new ApplicationException("Invalid username or password");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-        if (!result.Succeeded) throw new ApplicationException("Invalid username or password");
+        if (!result.Succeeded)
+            throw new ApplicationException("Invalid username or password");
 
         var (accessToken, refreshToken) = await _tokenService.GenerateTokensAsync(user);
-        return new { accessToken, refreshToken, user = new { id = user.Id, username = user.UserName } };
+        return new
+        {
+            accessToken,
+            refreshToken,
+            user = new { id = user.Id, username = user.UserName }
+        };
     }
 
     public async Task<object> RefreshAsync(string refreshToken)
@@ -52,6 +64,11 @@ public class AuthService
         var (accessToken, newRefreshToken) = await _tokenService.GenerateTokensAsync(user);
         await _tokenService.RevokeRefreshTokenAsync(refreshToken);
 
-        return new { accessToken, refreshToken = newRefreshToken, user = new { id = user.Id, username = user.UserName } };
+        return new
+        {
+            accessToken,
+            refreshToken = newRefreshToken,
+            user = new { id = user.Id, username = user.UserName }
+        };
     }
 }

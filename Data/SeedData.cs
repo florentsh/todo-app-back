@@ -4,7 +4,7 @@ using BackTodoApi.Models;
 
 public static class SeedData
 {
-    public static async Task SeedAsync(TodoContext db, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task SeedAsync(TodoContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         var roles = new[] { "Admin", "User" };
         foreach (var roleName in roles)
@@ -17,7 +17,7 @@ public static class SeedData
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
-            adminUser = new IdentityUser
+            adminUser = new ApplicationUser
             {
                 UserName = "admin",
                 Email = adminEmail,
@@ -35,7 +35,7 @@ public static class SeedData
         var regularUser = await userManager.FindByEmailAsync(userEmail);
         if (regularUser == null)
         {
-            regularUser = new IdentityUser
+            regularUser = new ApplicationUser
             {
                 UserName = "user",
                 Email = userEmail,
@@ -53,8 +53,8 @@ public static class SeedData
         {
             var todos = new[]
             {
-                new Todo { Title = "Seeded Todo 1", Description = "Created by SeedData", IsCompleted = false, UserId = regularUser.Id, CreatedAt = DateTime.UtcNow },
-                new Todo { Title = "Seeded Todo 2", Description = "Another seeded task", IsCompleted = false, UserId = regularUser.Id, CreatedAt = DateTime.UtcNow }
+                new Todo { Title = "Seeded Todo 1", Description = "Created by SeedData", IsCompleted = false, UserId = regularUser.Id },
+                new Todo { Title = "Seeded Todo 2", Description = "Another seeded task", IsCompleted = false, UserId = regularUser.Id }
             };
 
             db.Todos.AddRange(todos);

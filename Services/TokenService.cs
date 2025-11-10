@@ -16,16 +16,16 @@ namespace BackTodoApi.Services
     {
         private readonly IConfiguration _config;
         private readonly TodoContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TokenService(IConfiguration config, TodoContext context, UserManager<IdentityUser> userManager)
+        public TokenService(IConfiguration config, TodoContext context, UserManager<ApplicationUser> userManager)
         {
             _config = config;
             _context = context;
             _userManager = userManager;
         }
 
-        public async Task<(string accessToken, string refreshToken)> GenerateTokensAsync(IdentityUser user)
+        public async Task<(string accessToken, string refreshToken)> GenerateTokensAsync(ApplicationUser user)
         {
             var keyString = _config["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing");
             var key = Encoding.UTF8.GetBytes(keyString);
@@ -49,7 +49,7 @@ namespace BackTodoApi.Services
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _config["Jwt:Issuer"] ?? "BackTodoApi",
-                Audience = _config["Jwt:Audience"] 
+                Audience = _config["Jwt:Audience"]
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -70,7 +70,7 @@ namespace BackTodoApi.Services
             return (accessToken, refreshToken);
         }
 
-        public async Task<IdentityUser?> ValidateRefreshTokenAsync(string refreshToken)
+        public async Task<ApplicationUser?> ValidateRefreshTokenAsync(string refreshToken)
         {
             var tokenEntry = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
 
