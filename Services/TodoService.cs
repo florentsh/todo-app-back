@@ -11,10 +11,12 @@ public class TodoService : ITodoService
 {
     private readonly ITodoRepository _repo;
     private readonly IMapper _mapper;
+    private readonly IUserRepository _userRepo;
 
-    public TodoService(ITodoRepository repo, IMapper mapper)
+    public TodoService(ITodoRepository repo, IUserRepository userRepo, IMapper mapper)
     {
         _repo = repo;
+        _userRepo = userRepo;
         _mapper = mapper;
     }
 
@@ -129,6 +131,21 @@ public class TodoService : ITodoService
         }
 
         await _repo.DeleteAsync(todo);
+    }
+    public async Task AssignTodoAsync(AssignTodoDto dto, string? currentUserId, bool isAdmin)
+    {
+        if (dto == null) throw new BadRequestException("Invalid data");
+
+        var todo = await _repo.GetByIdAsync(dto.TodoId) ?? throw new NotFoundException($"Todo {dto.TodoId} not found");
+
+        if (!isAdmin)
+            throw new BadRequestException("Only admins can assign todos");
+
+        var user = await _userRepo.GetByIdAsync(dto.UserId);
+        if (user == null)
+            throw new NotFoundException($"User {dto.UserId} not found");
+
+        await _repo.AssignTodoToUserAsync(dto.TodoId, dto.UserId);
     }
 
 }

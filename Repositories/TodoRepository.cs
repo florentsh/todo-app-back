@@ -76,4 +76,14 @@ public class TodoRepository : ITodoRepository
             TotalItems = total
         };
     }
+    public async Task AssignTodoToUserAsync(int todoId, string userId)
+    {
+        var todo = await _context.Todos.FindAsync(todoId);
+        if (todo == null) throw new KeyNotFoundException($"Todo {todoId} not found");
+
+        todo.UserId = userId;
+        _context.Todos.Update(todo);
+        await _context.SaveChangesAsync();
+    }
+
 }

@@ -15,6 +15,7 @@ public interface ITodoService
     Task<TodoDto> UpdateAsync(int id, UpdateTodoDto dto, string? currentUserId, bool isAdmin);
     Task<TodoDto> MarkCompleteAsync(int id, bool isCompleted, string? currentUserId, bool isAdmin);
     Task DeleteAsync(int id, string? currentUserId, bool isAdmin);
+    Task AssignTodoAsync(AssignTodoDto dto, string? currentUserId, bool isAdmin);
 
 
 }

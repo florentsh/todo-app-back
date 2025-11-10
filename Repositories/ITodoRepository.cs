@@ -1,4 +1,5 @@
-﻿using BackTodoApi.Helpers;
+﻿using BackTodoApi.Dtos;
+using BackTodoApi.Helpers;
 using BackTodoApi.Models;
 
 namespace BackTodoApi.Repositories;
@@ -12,4 +13,8 @@ public interface ITodoRepository
     Task UpdateAsync(Todo todo);
     Task<PagedResult<Todo>> GetPagedAsync(int page, int pageSize);
     Task<PagedResult<Todo>> GetPagedByUserIdAsync(string userId, int page, int pageSize);
+    Task AssignTodoToUserAsync(int todoId, string userId);
+
+   
 }
+    

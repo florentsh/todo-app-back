@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackTodoApi.Migrations
 {
     [DbContext(typeof(TodoContext))]
-    [Migration("20251106135809_AddRefreshTokenFields")]
-    partial class AddRefreshTokenFields
+    [Migration("20251110100238_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

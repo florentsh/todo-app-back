@@ -176,4 +176,31 @@ public class TodoController : ControllerBase
             return StatusCode(500, new { message = "Internal server error" });
         }
     }
+    // POST api/todo/assign
+    [HttpPost("assign")]
+    [Authorize(Roles = "Admin")] // rregullo sipas nevojës
+    public async Task<IActionResult> Assign([FromBody] AssignTodoDto dto)
+    {
+        try
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("Admin");
+
+            await _service.AssignTodoAsync(dto, currentUserId, isAdmin);
+            return NoContent();
+        }
+        catch (NotFoundException nf)
+        {
+            return NotFound(new { message = nf.Message });
+        }
+        catch (BadRequestException br)
+        {
+            return BadRequest(new { message = br.Message });
+        }
+        catch
+        {
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
+
 }
