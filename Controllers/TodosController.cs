@@ -1,7 +1,7 @@
 ﻿using BackTodoApi.Dtos;
 using BackTodoApi.DTOs;
 using BackTodoApi.Exceptions;
-using BackTodoApi.Services;
+using BackTodoApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -178,7 +178,7 @@ public class TodoController : ControllerBase
     }
     // POST api/todo/assign
     [HttpPost("assign")]
-    [Authorize(Roles = "Admin")] // rregullo sipas nevojës
+    [Authorize(Roles = "Admin")] 
     public async Task<IActionResult> Assign([FromBody] AssignTodoDto dto)
     {
         try

@@ -2,7 +2,7 @@
 using BackTodoApi.Helpers;
 using BackTodoApi.Models;
 
-namespace BackTodoApi.Repositories;
+namespace BackTodoApi.Repositories.Interfaces;
 
 public interface ITodoRepository
 {

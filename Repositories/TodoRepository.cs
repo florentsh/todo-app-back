@@ -3,7 +3,7 @@ using BackTodoApi.Helpers;
 using BackTodoApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackTodoApi.Repositories;
+namespace BackTodoApi.Repositories.Interfaces;
 
 public class TodoRepository : ITodoRepository
 {

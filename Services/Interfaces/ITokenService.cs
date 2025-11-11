@@ -1,7 +1,7 @@
 ﻿using BackTodoApi.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackTodoApi.Services;
+namespace BackTodoApi.Services.Interfaces;
 
 public interface ITokenService
 {

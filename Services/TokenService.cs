@@ -1,5 +1,6 @@
 ﻿using BackTodoApi.Data;
 using BackTodoApi.Models;
+using BackTodoApi.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -1,12 +1,15 @@
 ﻿using BackTodoApi.Data;
 using BackTodoApi.Mapping;
 using BackTodoApi.Models;
+using BackTodoApi.Repositories.Interfaces;
 using BackTodoApi.Services;
+using BackTodoApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
+
 using System.Security.Claims;
 using System.Text;
 
@@ -49,11 +52,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<BackTodoApi.Repositories.IUserRepository, BackTodoApi.Repositories.UserRepository>();
-builder.Services.AddScoped<BackTodoApi.Repositories.ITodoRepository, BackTodoApi.Repositories.TodoRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<TodoService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 

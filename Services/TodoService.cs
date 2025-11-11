@@ -3,9 +3,10 @@ using BackTodoApi.Dtos;
 using BackTodoApi.Exceptions;
 using BackTodoApi.Helpers;
 using BackTodoApi.Models;
-using BackTodoApi.Repositories;
+using BackTodoApi.Repositories.Interfaces;
 
-namespace BackTodoApi.Services;
+
+namespace BackTodoApi.Services.Interfaces;
 
 public class TodoService : ITodoService
 {
@@ -25,12 +26,7 @@ public class TodoService : ITodoService
         if (string.IsNullOrWhiteSpace(dto.Title))
             throw new BadRequestException("Title is required.");
 
-        var todo = new Todo
-        {
-            Title = dto.Title,
-            Description = dto.Description!,
-            UserId = dto.UserId
-        };
+        var todo = _mapper.Map<Todo>(dto);
 
         var created = await _repo.AddAsync(todo);
         return _mapper.Map<TodoDto>(created);
@@ -94,9 +90,7 @@ public class TodoService : ITodoService
                 throw new BadRequestException("Access denied");
         }
 
-        todo.Title = dto.Title;
-        todo.Description = dto.Description!;
-        todo.IsCompleted = dto.IsCompleted;
+        _mapper.Map(dto, todo);
 
         await _repo.UpdateAsync(todo);
         return _mapper.Map<TodoDto>(todo);

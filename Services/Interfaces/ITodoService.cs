@@ -1,7 +1,7 @@
 ﻿using BackTodoApi.Dtos;
 using BackTodoApi.Helpers;
 
-namespace BackTodoApi.Services;
+namespace BackTodoApi.Services.Interfaces;
 
 public interface ITodoService
 {

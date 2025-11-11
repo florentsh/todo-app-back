@@ -1,10 +1,10 @@
 ﻿using BackTodoApi.Dtos;
-using BackTodoApi.Repositories;
 using BackTodoApi.Models;
 using Microsoft.AspNetCore.Identity;
+using BackTodoApi.Repositories.Interfaces;
+using BackTodoApi.Services.Interfaces;
 
 namespace BackTodoApi.Services;
-
 public class AuthService
 {
     private readonly IUserRepository _userRepo;
