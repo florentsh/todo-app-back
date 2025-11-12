@@ -5,7 +5,6 @@ using BackTodoApi.Helpers;
 using BackTodoApi.Models;
 using BackTodoApi.Repositories.Interfaces;
 
-
 namespace BackTodoApi.Services.Interfaces;
 
 public class TodoService : ITodoService
@@ -27,24 +26,13 @@ public class TodoService : ITodoService
             throw new BadRequestException("Title is required.");
 
         var todo = _mapper.Map<Todo>(dto);
-
         var created = await _repo.AddAsync(todo);
         return _mapper.Map<TodoDto>(created);
     }
 
-    public async Task<TodoDto> GetByIdAsync(int id, string? currentUserId, bool isAdmin)
+    public async Task<TodoDto> GetByIdAsync(int id)
     {
         var todo = await _repo.GetByIdAsync(id) ?? throw new NotFoundException($"Todo {id} not found");
-
-       
-        if (!isAdmin)
-        {
-            if (!string.IsNullOrEmpty(todo.UserId) && todo.UserId != currentUserId)
-                throw new BadRequestException("Access denied");
-            if (string.IsNullOrEmpty(todo.UserId))
-                throw new BadRequestException("Access denied");
-        }
-
         return _mapper.Map<TodoDto>(todo);
     }
 
@@ -78,62 +66,37 @@ public class TodoService : ITodoService
         };
     }
 
-    public async Task<TodoDto> UpdateAsync(int id, UpdateTodoDto dto, string? currentUserId, bool isAdmin)
+    public async Task<TodoDto> UpdateAsync(int id, UpdateTodoDto dto)
     {
         var todo = await _repo.GetByIdAsync(id) ?? throw new NotFoundException($"Todo {id} not found");
-
-        if (!isAdmin)
-        {
-            if (!string.IsNullOrEmpty(todo.UserId) && todo.UserId != currentUserId)
-                throw new BadRequestException("Access denied");
-            if (string.IsNullOrEmpty(todo.UserId))
-                throw new BadRequestException("Access denied");
-        }
 
         _mapper.Map(dto, todo);
 
         await _repo.UpdateAsync(todo);
         return _mapper.Map<TodoDto>(todo);
     }
-    public async Task<TodoDto> MarkCompleteAsync(int id, bool isCompleted, string? currentUserId, bool isAdmin)
+
+    public async Task<TodoDto> MarkCompleteAsync(int id, bool isCompleted)
     {
         var todo = await _repo.GetByIdAsync(id) ?? throw new NotFoundException($"Todo {id} not found");
-
-        if (!isAdmin)
-        {
-            if (!string.IsNullOrEmpty(todo.UserId) && todo.UserId != currentUserId)
-                throw new BadRequestException("Access denied");
-            if (string.IsNullOrEmpty(todo.UserId))
-                throw new BadRequestException("Access denied");
-        }
 
         todo.IsCompleted = isCompleted;
         await _repo.UpdateAsync(todo);
 
         return _mapper.Map<TodoDto>(todo);
     }
-    public async Task DeleteAsync(int id, string? currentUserId, bool isAdmin)
+
+    public async Task DeleteAsync(int id)
     {
         var todo = await _repo.GetByIdAsync(id) ?? throw new NotFoundException($"Todo {id} not found");
-
-        if (!isAdmin)
-        {
-            if (!string.IsNullOrEmpty(todo.UserId) && todo.UserId != currentUserId)
-                throw new BadRequestException("Access denied");
-            if (string.IsNullOrEmpty(todo.UserId))
-                throw new BadRequestException("Access denied");
-        }
-
         await _repo.DeleteAsync(todo);
     }
-    public async Task AssignTodoAsync(AssignTodoDto dto, string? currentUserId, bool isAdmin)
+
+    public async Task AssignTodoAsync(AssignTodoDto dto)
     {
         if (dto == null) throw new BadRequestException("Invalid data");
 
         var todo = await _repo.GetByIdAsync(dto.TodoId) ?? throw new NotFoundException($"Todo {dto.TodoId} not found");
-
-        if (!isAdmin)
-            throw new BadRequestException("Only admins can assign todos");
 
         var user = await _userRepo.GetByIdAsync(dto.UserId);
         if (user == null)
@@ -141,5 +104,4 @@ public class TodoService : ITodoService
 
         await _repo.AssignTodoToUserAsync(dto.TodoId, dto.UserId);
     }
-
 }

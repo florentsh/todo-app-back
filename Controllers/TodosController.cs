@@ -19,6 +19,8 @@ public class TodoController : ControllerBase
     {
         _service = service;
     }
+    private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    private bool IsAdmin => User.IsInRole("Admin");
 
     // GET api/todo/{id}
     [HttpGet("{id}")]
@@ -26,19 +28,20 @@ public class TodoController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = User.IsInRole("Admin");
+            var todo = await _service.GetByIdAsync(id);
 
-            var todo = await _service.GetByIdAsync(id, userId, isAdmin);
+            if (!IsAdmin && todo.UserId != CurrentUserId)
+                return Forbid();
+
             return Ok(todo);
         }
         catch (NotFoundException nf)
         {
             return NotFound(new { message = nf.Message });
         }
-        catch (BadRequestException) 
+        catch (BadRequestException br)
         {
-            return Forbid();
+            return BadRequest(new { message = br.Message });
         }
         catch
         {
@@ -55,15 +58,14 @@ public class TodoController : ControllerBase
             page = page <= 0 ? 1 : page;
             pageSize = pageSize <= 0 ? 20 : pageSize;
 
-            var isAdmin = User.IsInRole("Admin");
-            if (isAdmin)
+            if (IsAdmin)
             {
                 var paged = await _service.GetPagedAsync(page, pageSize);
                 return Ok(paged);
             }
             else
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = CurrentUserId;
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized(new { message = "Invalid token or user not found." });
 
@@ -83,8 +85,7 @@ public class TodoController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!string.IsNullOrEmpty(userId)) dto.UserId = userId;
+            dto.UserId = CurrentUserId;
 
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
@@ -105,19 +106,21 @@ public class TodoController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = User.IsInRole("Admin");
+            var existing = await _service.GetByIdAsync(id);
 
-            var updated = await _service.UpdateAsync(id, dto, userId, isAdmin);
+            if (!IsAdmin && existing.UserId != CurrentUserId)
+                return Forbid();
+
+            var updated = await _service.UpdateAsync(id, dto);
             return Ok(updated);
         }
         catch (NotFoundException nf)
         {
             return NotFound(new { message = nf.Message });
         }
-        catch (BadRequestException)
+        catch (BadRequestException br)
         {
-            return Forbid();
+            return BadRequest(new { message = br.Message });
         }
         catch
         {
@@ -125,25 +128,27 @@ public class TodoController : ControllerBase
         }
     }
 
-    // PATCH api/todo/{id}/complete 
+    // PATCH api/todo/{id}/complete
     [HttpPatch("{id}/complete")]
     public async Task<IActionResult> MarkComplete(int id, [FromBody] MarkCompleteDto body)
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = User.IsInRole("Admin");
+            var existing = await _service.GetByIdAsync(id);
 
-            var updated = await _service.MarkCompleteAsync(id, body.IsCompleted, userId, isAdmin);
+            if (!IsAdmin && existing.UserId != CurrentUserId)
+                return Forbid();
+
+            var updated = await _service.MarkCompleteAsync(id, body.IsCompleted);
             return Ok(updated);
         }
         catch (NotFoundException nf)
         {
             return NotFound(new { message = nf.Message });
         }
-        catch (BadRequestException)
+        catch (BadRequestException br)
         {
-            return Forbid();
+            return BadRequest(new { message = br.Message });
         }
         catch
         {
@@ -157,36 +162,12 @@ public class TodoController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = User.IsInRole("Admin");
+            var existing = await _service.GetByIdAsync(id);
 
-            await _service.DeleteAsync(id, userId, isAdmin);
-            return NoContent();
-        }
-        catch (NotFoundException nf)
-        {
-            return NotFound(new { message = nf.Message });
-        }
-        catch (BadRequestException)
-        {
-            return Forbid();
-        }
-        catch
-        {
-            return StatusCode(500, new { message = "Internal server error" });
-        }
-    }
-    // POST api/todo/assign
-    [HttpPost("assign")]
-    [Authorize(Roles = "Admin")] 
-    public async Task<IActionResult> Assign([FromBody] AssignTodoDto dto)
-    {
-        try
-        {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = User.IsInRole("Admin");
+            if (!IsAdmin && existing.UserId != CurrentUserId)
+                return Forbid();
 
-            await _service.AssignTodoAsync(dto, currentUserId, isAdmin);
+            await _service.DeleteAsync(id);
             return NoContent();
         }
         catch (NotFoundException nf)
@@ -203,4 +184,27 @@ public class TodoController : ControllerBase
         }
     }
 
+    // POST api/todo/assign
+    [HttpPost("assign")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Assign([FromBody] AssignTodoDto dto)
+    {
+        try
+        {
+            await _service.AssignTodoAsync(dto);
+            return NoContent();
+        }
+        catch (NotFoundException nf)
+        {
+            return NotFound(new { message = nf.Message });
+        }
+        catch (BadRequestException br)
+        {
+            return BadRequest(new { message = br.Message });
+        }
+        catch
+        {
+            return StatusCode(500, new { message = "Internal server error" });
+        }
+    }
 }
